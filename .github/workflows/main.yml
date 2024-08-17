@@ -1,0 +1,77 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - master
+env:
+  DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
+jobs:
+  notify-start:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify Discord - Build Triggered
+        run: |
+          curl -H "Content-Type: application/json" \
+               -X POST \
+               -d "{\"content\": \"🚀 A new build has been triggered on the master branch.\"}" \
+               $DISCORD_WEBHOOK
+
+  unit-tests:
+    runs-on: ubuntu-latest
+    needs: notify-start
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Unity
+        uses: game-ci/unity-setup@v2
+        with:
+          unityVersion: 2020.3.12f1 # Replace with your Unity version
+
+      - name: Run Unit Tests
+        run: |
+          # Run Unity with the test mode enabled
+          /opt/unity/Editor/Unity \
+            -runTests \
+            -projectPath . \
+            -testResults ./test-results.xml \
+            -logFile /dev/stdout \
+            -batchmode \
+            -quit \
+            || echo "Unit tests failed"
+
+      - name: Report Unit Test Results
+        if: failure()
+        run: |
+          TEST_ERROR=$(tail -n 10 /opt/unity/Editor/Unity.log)
+          curl -H "Content-Type: application/json" \
+               -X POST \
+               -d "{\"content\": \"❌ Unit tests failed on the master branch.\nError Details: ${TEST_ERROR}\"}" \
+               $DISCORD_WEBHOOK
+
+      - name: Publish Test Results
+        if: success()
+        run: |
+          curl -H "Content-Type: application/json" \
+               -X POST \
+               -d "{\"content\": \"✅ Unit tests passed successfully on the master branch.\"}" \
+               $DISCORD_WEBHOOK
+
+  notify-end:
+    runs-on: ubuntu-latest
+    needs: unit-tests
+    steps:
+      - name: Notify Discord - Pipeline Completed
+        run: |
+          if [ "${{ needs.unit-tests.result }}" == "failure" ]; then
+            curl -H "Content-Type: application/json" \
+                 -X POST \
+                 -d "{\"content\": \"⚠️ The CI pipeline completed with errors on the master branch.\"}" \
+                 $DISCORD_WEBHOOK
+          else
+            curl -H "Content-Type: application/json" \
+                 -X POST \
+                 -d "{\"content\": \"🎉 The CI pipeline completed successfully on the master branch.\"}" \
+                 $DISCORD_WEBHOOK
+          fi
