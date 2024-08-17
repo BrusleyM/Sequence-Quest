@@ -72,3 +72,9 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 /Temp/UnityLockfile
 /Temp/UnityLockfile
+/Library/*.db
+/Library
+/Temp
+/UserSettings
+/Logs
+/*.sln
