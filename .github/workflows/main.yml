@@ -22,12 +22,12 @@ jobs:
     needs: notify-start
     steps:
       - name: Checkout code
-  # You may pin to the exact commit or the version.
-  # uses: ArtyProf/dotnet-build-test-publish-action@ef989a2459b17ad6555bac39ebe489d9a9128daa
-  uses: ArtyProf/dotnet-build-test-publish-action@v1.2.0
-  with:
-    # SonarCloud project key
-    sonar-project-key: # optional, default is 
+        # You may pin to the exact commit or the version.
+        # uses: ArtyProf/dotnet-build-test-publish-action@ef989a2459b17ad6555bac39ebe489d9a9128daa
+        uses: ArtyProf/dotnet-build-test-publish-action@v1.2.0
+          with:
+      # SonarCloud project key
+          sonar-project-key: # optional, default is 
     # SonarCloud token
     sonar-token: # optional, default is 
     # SonarCloud organization
