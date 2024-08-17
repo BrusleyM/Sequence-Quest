@@ -22,25 +22,11 @@ jobs:
     needs: notify-start
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Setup Unity
-        uses: game-ci/unity-setup@v2
-        with:
-          unityVersion: 2020.3.12f1 # Replace with your Unity version
-
-      - name: Run Unit Tests
-        run: |
-          # Run Unity with the test mode enabled
-          /opt/unity/Editor/Unity \
-            -runTests \
-            -projectPath . \
-            -testResults ./test-results.xml \
-            -logFile /dev/stdout \
-            -batchmode \
-            -quit \
-            || echo "Unit tests failed"
-
+      
+  # You may pin to the exact commit or the version.
+  # uses: RachelGanonNew/Run-All-.Net-Unit-Test@bb6eb3c83b36c949e7598bdaff8198c037bd68c0
+        uses: RachelGanonNew/Run-All-.Net-Unit-Test@v1.2.1
+          
       - name: Report Unit Test Results
         if: failure()
         run: |
