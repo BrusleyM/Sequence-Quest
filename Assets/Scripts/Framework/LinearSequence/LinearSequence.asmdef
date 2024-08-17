@@ -1,0 +1,16 @@
+{
+    "name": "LinearSequence",
+    "rootNamespace": "Framework.LinearSequence",
+    "references": [
+        "GUID:fdf8839483c92414f967146944292f7b"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
