@@ -35,16 +35,23 @@ jobs:
         run: dotnet restore
 
       - name: Run Unit Tests
-        run: dotnet test --no-build --logger "trx;LogFileName=test-results.trx"
+        run: dotnet test --no-build --logger "trx;LogFileName=test-results.trx" --results-directory ./TestResults
 
       - name: Report Unit Test Results on Failure
         if: failure()
         run: |
-          TEST_ERROR=$(tail -n 10 test-results.trx)
-          curl -H "Content-Type: application/json" \
-               -X POST \
-               -d "{\"content\": \"❌ Unit tests failed on the master branch.\nError Details: ${TEST_ERROR}\"}" \
-               $DISCORD_WEBHOOK
+          if [ -f ./TestResults/test-results.trx ]; then
+            TEST_ERROR=$(tail -n 10 ./TestResults/test-results.trx)
+            curl -H "Content-Type: application/json" \
+                 -X POST \
+                 -d "{\"content\": \"❌ Unit tests failed on the master branch.\nError Details: ${TEST_ERROR}\"}" \
+                 $DISCORD_WEBHOOK
+          else
+            curl -H "Content-Type: application/json" \
+                 -X POST \
+                 -d "{\"content\": \"❌ Unit tests failed on the master branch, but no test results file was found.\"}" \
+                 $DISCORD_WEBHOOK
+          fi
 
       - name: Report Unit Test Results on Success
         if: success()
@@ -70,4 +77,3 @@ jobs:
                  -X POST \
                  -d "{\"content\": \"🎉 The CI pipeline completed successfully on the master branch.\"}" \
                  $DISCORD_WEBHOOK
-          fi
